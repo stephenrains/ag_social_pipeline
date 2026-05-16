@@ -1,0 +1,13 @@
+1. CREATE THE TABLE
+createdb ag_social
+
+2. ACCESS THE DB:
+psql -d ag_social
+
+3. CREATE USER (Optional if you already have a user you want to use)
+CREATE ROLE ag_social WITH LOGIN PASSWORD 'ag_social';
+
+4. GRANT FULL ACCESS
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO ag_social;
+
+5. Run the 03_grants.sql to get full permissions if step 4 doesn't complete

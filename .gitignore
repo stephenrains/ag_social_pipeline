@@ -1,0 +1,11 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+venv/
+.idea/
+.DS_Store
+.env.example
+HANDOFF.md
+endpoints.txt
+raw_data
