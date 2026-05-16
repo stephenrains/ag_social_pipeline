@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS ig_accounts (
     is_private              BOOLEAN     NOT NULL,
     username                TEXT        NOT NULL,
     full_name               TEXT,
-    profile_pic_local_path  TEXT,
+    profile_pic_key         TEXT,                            -- S3 object key, e.g. account_profile_images/{account_id}.jpg
     followers               INTEGER,
     following               INTEGER,
     published_posts         INTEGER,

@@ -15,7 +15,7 @@ def upsert_post(engine: Engine, post: dict, media: list[dict], users_tagged: lis
 
     `post` keys: ig_post_id, post_owner_username, caption, post_type, likes, views,
                  comments, paid_partnership, taken_at
-    `media` items: position, media_type, local_path, height, width
+    `media` items: position, media_type, media_key, height, width
     """
     now = datetime.now(timezone.utc)
 
@@ -58,8 +58,8 @@ def upsert_post(engine: Engine, post: dict, media: list[dict], users_tagged: lis
             conn.execute(
                 text(
                     """
-                    INSERT INTO ig_post_media (ig_post_id, position, media_type, local_path, height, width)
-                    VALUES (:ig_post_id, :position, :media_type, :local_path, :height, :width)
+                    INSERT INTO ig_post_media (ig_post_id, position, media_type, media_key, height, width)
+                    VALUES (:ig_post_id, :position, :media_type, :media_key, :height, :width)
                     """
                 ),
                 [{"ig_post_id": post_id, **m} for m in media],
@@ -78,14 +78,14 @@ def upsert_post(engine: Engine, post: dict, media: list[dict], users_tagged: lis
             )
 
 
-def upsert_account(engine: Engine, account: dict, profile_pic_local_path: str | None) -> None:
+def upsert_account(engine: Engine, account: dict, profile_pic_key: str | None) -> None:
     """
     Upsert one row into ig_accounts. Conflict key is (account_type, account_id).
-    `account` must contain all ig_accounts fields except profile_pic_local_path,
+    `account` must contain all ig_accounts fields except profile_pic_key,
     fetched_at, and updated_at.
     """
     now = datetime.now(timezone.utc)
-    params = {**account, "profile_pic_local_path": profile_pic_local_path, "now": now}
+    params = {**account, "profile_pic_key": profile_pic_key, "now": now}
 
     with engine.begin() as conn:
         conn.execute(
@@ -93,31 +93,31 @@ def upsert_account(engine: Engine, account: dict, profile_pic_local_path: str | 
                 """
                 INSERT INTO ig_accounts (
                     account_type, account_id, profile_type, is_private, username,
-                    full_name, profile_pic_local_path, followers, following,
+                    full_name, profile_pic_key, followers, following,
                     published_posts, contact_method, city, bio,
                     bio_link_type, bio_link_title, fetched_at, updated_at
                 )
                 VALUES (
                     :account_type, :account_id, :profile_type, :is_private, :username,
-                    :full_name, :profile_pic_local_path, :followers, :following,
+                    :full_name, :profile_pic_key, :followers, :following,
                     :published_posts, :contact_method, :city, :bio,
                     :bio_link_type, :bio_link_title, :now, :now
                 )
                 ON CONFLICT (account_type, account_id) DO UPDATE SET
-                    profile_type           = EXCLUDED.profile_type,
-                    is_private             = EXCLUDED.is_private,
-                    username               = EXCLUDED.username,
-                    full_name              = EXCLUDED.full_name,
-                    profile_pic_local_path = COALESCE(EXCLUDED.profile_pic_local_path, ig_accounts.profile_pic_local_path),
-                    followers              = EXCLUDED.followers,
-                    following              = EXCLUDED.following,
-                    published_posts        = EXCLUDED.published_posts,
-                    contact_method         = EXCLUDED.contact_method,
-                    city                   = EXCLUDED.city,
-                    bio                    = EXCLUDED.bio,
-                    bio_link_type          = EXCLUDED.bio_link_type,
-                    bio_link_title         = EXCLUDED.bio_link_title,
-                    updated_at             = EXCLUDED.updated_at
+                    profile_type     = EXCLUDED.profile_type,
+                    is_private       = EXCLUDED.is_private,
+                    username         = EXCLUDED.username,
+                    full_name        = EXCLUDED.full_name,
+                    profile_pic_key  = COALESCE(EXCLUDED.profile_pic_key, ig_accounts.profile_pic_key),
+                    followers        = EXCLUDED.followers,
+                    following        = EXCLUDED.following,
+                    published_posts  = EXCLUDED.published_posts,
+                    contact_method   = EXCLUDED.contact_method,
+                    city             = EXCLUDED.city,
+                    bio              = EXCLUDED.bio,
+                    bio_link_type    = EXCLUDED.bio_link_type,
+                    bio_link_title   = EXCLUDED.bio_link_title,
+                    updated_at       = EXCLUDED.updated_at
                 """
             ),
             params,

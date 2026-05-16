@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS ig_post_media (
     ig_post_id  TEXT     NOT NULL REFERENCES ig_posts(ig_post_id) ON DELETE CASCADE,
     position    SMALLINT NOT NULL,                       -- 0 for single, 0..n for carousel
     media_type  SMALLINT NOT NULL,                       -- 1=photo, 2=video
-    local_path  TEXT     NOT NULL,
+    media_key   TEXT     NOT NULL,                       -- S3 object key, e.g. posts/{username}/{post_id}/{position}.{ext}
     height      INTEGER  NOT NULL,
     width       INTEGER  NOT NULL,
     UNIQUE (ig_post_id, position)

@@ -10,7 +10,7 @@ import time
 
 from src.db import get_engine, upsert_post
 from src.ig_api import fetch_posts_page
-from src.media import download_media
+from src.media import upload_post_media
 from src.transform import transform_node
 
 DEFAULT_MAX_POSTS = 96
@@ -35,7 +35,7 @@ def _process_edge(engine, username: str, edge: dict) -> tuple[bool, int, bool]:
     media_rows = []
     try:
         for item in t["media"]:
-            local_path = download_media(
+            media_key = upload_post_media(
                 url=item["url"],
                 username=username,
                 ig_post_id=ig_post_id,
@@ -45,12 +45,12 @@ def _process_edge(engine, username: str, edge: dict) -> tuple[bool, int, bool]:
             media_rows.append({
                 "position": item["position"],
                 "media_type": item["media_type"],
-                "local_path": local_path,
+                "media_key": media_key,
                 "height": item["height"],
                 "width": item["width"],
             })
     except Exception as e:
-        print(f"  skip {ig_post_id}: media download failed: {e}")
+        print(f"  skip {ig_post_id}: media upload failed: {e}")
         return False, 0, True
 
     try:
