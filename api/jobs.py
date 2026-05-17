@@ -34,7 +34,9 @@ class Job:
     error: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
-        return asdict(self)
+        d = asdict(self)
+        d["job_id"] = d.pop("id")
+        return d
 
 
 class JobManager:
